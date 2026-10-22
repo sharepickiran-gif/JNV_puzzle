@@ -1,4 +1,7 @@
 let imagePaths = [];
+const GITHUB_IMAGES_API =
+    "https://api.github.com/repos/sharepickiran-gif/JNV_puzzle/contents/images";
+const SUPPORTED_IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|bmp)$/i;
 const GRID_SIZE = 4;
 const TOTAL_PIECES = GRID_SIZE * GRID_SIZE;
 
@@ -230,49 +233,51 @@ function resetPuzzle() {
 }
 
 async function fetchImagePaths() {
-    const response = await fetch("/api/images", { cache: "no-store" });
+    const isGitHubPages = window.location.hostname.endsWith(".github.io");
+    const imageListUrl = isGitHubPages ? GITHUB_IMAGES_API : "images.json";
+    const response = await fetch(imageListUrl, { cache: "no-store" });
 
     if (!response.ok) {
         throw new Error(`Image list request failed (${response.status})`);
     }
 
-    const filenames = await response.json();
+    const files = await response.json();
 
-    if (!Array.isArray(filenames) || filenames.length === 0) {
+    if (!Array.isArray(files)) {
+        throw new Error("The image list response is invalid");
+    }
+
+    const paths = isGitHubPages
+        ? files
+            .filter((file) =>
+                file.type === "file" &&
+                SUPPORTED_IMAGE_EXTENSION.test(file.name) &&
+                typeof file.download_url === "string"
+            )
+            .map((file) => file.download_url)
+        : files.map((filename) => `images/${encodeURIComponent(filename)}`);
+
+    if (paths.length === 0) {
         throw new Error("The images folder contains no supported images");
     }
 
-    return filenames.map(
-        (filename) => `images/${encodeURIComponent(filename)}`
-    );
+    return paths;
 }
 
-async function chooseNewImage() {
-    newImageButton.disabled = true;
+function chooseNewImage() {
+    const otherImages = imagePaths.filter(
+        (imagePath) => imagePath !== currentImagePath
+    );
+    const imagesToChooseFrom = otherImages.length > 0
+        ? otherImages
+        : imagePaths;
+    const randomIndex = Math.floor(
+        Math.random() * imagesToChooseFrom.length
+    );
 
-    try {
-        imagePaths = await fetchImagePaths();
-
-        const otherImages = imagePaths.filter(
-            (imagePath) => imagePath !== currentImagePath
-        );
-        const imagesToChooseFrom = otherImages.length > 0
-            ? otherImages
-            : imagePaths;
-        const randomIndex = Math.floor(
-            Math.random() * imagesToChooseFrom.length
-        );
-
-        currentImagePath = imagesToChooseFrom[randomIndex];
-        referenceImage.src = currentImagePath;
-        resetPuzzle();
-    } catch (error) {
-        console.error("Could not refresh images from the images folder.", error);
-        message.textContent =
-            "Could not refresh images. Check that the local server is running.";
-    } finally {
-        newImageButton.disabled = false;
-    }
+    currentImagePath = imagesToChooseFrom[randomIndex];
+    referenceImage.src = currentImagePath;
+    resetPuzzle();
 }
 
 async function initialiseGame() {
@@ -290,7 +295,7 @@ async function initialiseGame() {
     } catch (error) {
         console.error("Could not load images from the images folder.", error);
         message.textContent =
-            "Could not load images. Start the app with `python server.py` and open http://127.0.0.1:8000.";
+            "Could not load the image list. Check the GitHub repository connection or start the local server.";
     }
 }
 

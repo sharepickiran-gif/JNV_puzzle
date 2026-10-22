@@ -12,7 +12,7 @@ IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 
 class PuzzleRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        if urlsplit(self.path).path == "/api/images":
+        if urlsplit(self.path).path == "/images.json":
             filenames = sorted(
                 (
                     image.name
