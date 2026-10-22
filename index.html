@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNV Ernakulam - Campus Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>JNV Ernakulam</h1>
+        <h2>Campus Jigsaw Puzzle</h2>
+        <p>Can you put our school back together?</p>
+    </header>
+
+    <main>
+        <section class="reference-area">
+            <h3>Reference Image</h3>
+            <img
+                id="reference-image"
+                src="images/JNV_gate.png"
+                alt="Reference image of JNV Ernakulam campus"
+            >
+        </section>
+
+        <section class="game-container">
+            <div class="puzzle-area">
+                <h3>Assemble the Campus</h3>
+                <div id="puzzle-board"></div>
+            </div>
+
+            <div class="pieces-area">
+                <h3>Puzzle Pieces</h3>
+                <div id="pieces-container"></div>
+            </div>
+
+        </section>
+
+        <p id="message"></p>
+
+        <button id="shuffle-button">Shuffle Pieces</button>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

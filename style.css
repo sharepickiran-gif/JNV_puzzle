@@ -1,0 +1,138 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f4f1;
+    color: #243328;
+    text-align: center;
+}
+
+header {
+    background: #244b35;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+header h2 {
+    margin: 0 0 8px;
+}
+
+main {
+    max-width: 1600px;
+    width: 100%;
+    margin: auto;
+    padding: 16px;
+}
+.game-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.puzzle-area,
+.pieces-area {
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 8px #00000012;
+}
+
+#puzzle-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    width: 100%;
+    aspect-ratio: 1.15;
+    background: #d9dfd8;
+    padding: 1px;
+}
+
+#pieces-container {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+}
+
+.puzzle-slot,
+.puzzle-piece {
+    aspect-ratio: 1.15;
+    min-width: 0;
+}
+
+.puzzle-slot {
+    border: 1px dashed #aab5aa;
+    background: #edf0eb;
+}
+
+.puzzle-piece {
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: 400% 400%;
+    border: 1px solid white;
+    cursor: grab;
+    touch-action: none;
+}
+
+.puzzle-piece:active {
+    cursor: grabbing;
+}
+
+.puzzle-slot .puzzle-piece {
+    height: 100%;
+}
+
+button {
+    margin: 16px 0;
+    padding: 12px 22px;
+    background: #286342;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #1c4a30;
+}
+
+#message {
+    font-weight: bold;
+    color: #286342;
+    min-height: 24px;
+}
+
+@media (max-width: 700px) {
+    .game-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.reference-area,
+.puzzle-area,
+.pieces-area {
+    min-width: 0;
+}
+
+.reference-area {
+    width: min(100%, 360px);
+    margin: 0 0 16px;
+}
+
+#reference-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid #cbd5cb;
+    border-radius: 4px;
+}
