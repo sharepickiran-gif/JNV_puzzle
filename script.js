@@ -4,6 +4,7 @@ const GITHUB_IMAGES_API =
 const SUPPORTED_IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|bmp)$/i;
 const GRID_SIZE = 4;
 const TOTAL_PIECES = GRID_SIZE * GRID_SIZE;
+const GAME_DURATION_SECONDS = 60;
 
 const puzzleBoard = document.getElementById("puzzle-board");
 const piecesContainer = document.getElementById("pieces-container");
@@ -16,7 +17,7 @@ const newImageButton = document.getElementById("new-image-button");
 
 let selectedPiece = null;
 let timerInterval = null;
-let startTime = null;
+let deadline = null;
 let gameStarted = false;
 let currentImagePath = null;
 
@@ -82,7 +83,7 @@ function shufflePieces() {
     gameStarted = false;
     startButton.disabled = false;
     startButton.textContent = "Start Puzzle";
-    updateTimer(0);
+    updateTimer(GAME_DURATION_SECONDS);
 
     const ids = Array.from(
         { length: TOTAL_PIECES },
@@ -115,6 +116,11 @@ function handleDrop(event) {
     event.preventDefault();
 
     if (!gameStarted) {
+        return;
+    }
+
+    if (getRemainingSeconds() <= 0) {
+        failGame();
         return;
     }
 
@@ -161,14 +167,17 @@ function checkPuzzle() {
     });
 
     if (completed) {
-        const completionTime = getElapsedSeconds();
+        const remainingSeconds = getRemainingSeconds();
         stopTimer();
         gameStarted = false;
         puzzleBoard.querySelectorAll(".puzzle-piece").forEach((piece) => {
             piece.draggable = false;
         });
+        piecesContainer.querySelectorAll(".puzzle-piece").forEach((piece) => {
+            piece.draggable = false;
+        });
         message.textContent =
-            `Congratulations! You have assembled the JNV campus in ${formatTime(completionTime)}! 🎉`;
+            `Congratulations! You solved the puzzle with ${formatTime(remainingSeconds)} remaining! 🎉`;
         startButton.textContent = "Puzzle Solved";
         startButton.disabled = true;
     } else {
@@ -184,15 +193,15 @@ function formatTime(totalSeconds) {
 }
 
 function updateTimer(totalSeconds) {
-    timerDisplay.textContent = `Time: ${formatTime(totalSeconds)}`;
+    timerDisplay.textContent = `Time remaining: ${formatTime(totalSeconds)}`;
 }
 
-function getElapsedSeconds() {
-    if (startTime === null) {
-        return 0;
+function getRemainingSeconds() {
+    if (deadline === null) {
+        return GAME_DURATION_SECONDS;
     }
 
-    return Math.floor((Date.now() - startTime) / 1000);
+    return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
 }
 
 function stopTimer() {
@@ -201,10 +210,23 @@ function stopTimer() {
         timerInterval = null;
     }
 
-    if (startTime !== null) {
-        updateTimer(getElapsedSeconds());
-        startTime = null;
-    }
+    deadline = null;
+}
+
+function failGame() {
+    stopTimer();
+    gameStarted = false;
+    updateTimer(0);
+    puzzleBoard.querySelectorAll(".puzzle-piece").forEach((piece) => {
+        piece.draggable = false;
+    });
+    piecesContainer.querySelectorAll(".puzzle-piece").forEach((piece) => {
+        piece.draggable = false;
+    });
+    message.textContent =
+        "Time's up! You were unable to complete the puzzle. Shuffle the pieces to try again.";
+    startButton.textContent = "Time's Up";
+    startButton.disabled = true;
 }
 
 function startGame() {
@@ -213,16 +235,22 @@ function startGame() {
     }
 
     gameStarted = true;
-    startTime = Date.now();
+    deadline = Date.now() + GAME_DURATION_SECONDS * 1000;
     startButton.disabled = true;
     startButton.textContent = "Puzzle Started";
+    updateTimer(GAME_DURATION_SECONDS);
 
     piecesContainer.querySelectorAll(".puzzle-piece").forEach((piece) => {
         piece.draggable = true;
     });
 
     timerInterval = setInterval(() => {
-        updateTimer(getElapsedSeconds());
+        const remainingSeconds = getRemainingSeconds();
+        updateTimer(remainingSeconds);
+
+        if (remainingSeconds === 0) {
+            failGame();
+        }
     }, 250);
 }
 
