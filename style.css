@@ -91,6 +91,21 @@ main {
     height: 100%;
 }
 
+.game-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+#timer {
+    margin: 0;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
 button {
     margin: 16px 0;
     padding: 12px 22px;
@@ -104,6 +119,11 @@ button {
 
 button:hover {
     background: #1c4a30;
+}
+
+button:disabled {
+    background: #748579;
+    cursor: not-allowed;
 }
 
 #message {
